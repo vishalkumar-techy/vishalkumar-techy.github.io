@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Calculator – Vishal Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050507;--ink:#f3f3f3;--dim:#9a9aa3;--line:rgba(255,255,255,.14);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100svh;background:radial-gradient(circle at 50% 0,#202030,var(--bg) 65%);color:var(--ink);font-family:"Inter Tight",system-ui,-apple-system,sans-serif;display:grid;place-items:center;padding:1rem}
+.app{width:min(380px,100%)}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--dim);margin-bottom:.8rem}
+.top a{color:inherit;text-decoration:none}
+.top button{all:unset;cursor:pointer;color:var(--ink);border:1px solid var(--line);padding:.2rem .8rem;border-radius:999px}
+.disp{padding:1rem 1.2rem;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.04);text-align:right;margin-bottom:.8rem;min-height:7rem;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+#ex{color:var(--dim);font-size:1.1rem;min-height:1.6rem;word-break:break-all}
+#rs{font-size:clamp(2.2rem,11vw,3.2rem);font-weight:800;letter-spacing:-.03em;word-break:break-all;line-height:1.1}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem}
+.sci{display:none;grid-template-columns:repeat(5,1fr);gap:.45rem;margin-bottom:.55rem}
+.on .sci{display:grid}
+.k{all:unset;display:block;box-sizing:border-box;text-align:center;padding:.95rem 0;border-radius:16px;background:rgba(255,255,255,.07);font-size:1.25rem;font-weight:500;cursor:pointer;user-select:none;transition:transform .08s,background .15s}
+.k:active{transform:scale(.94)}.k:hover{background:rgba(255,255,255,.14)}.k:focus-visible{outline:2px solid #fff}
+.sci .k{font-size:.95rem;padding:.7rem 0}
+.k.op{background:rgba(255,255,255,.16)}.k.eq{background:#f3f3f3;color:#000}.k.ac{color:#ff8a80}
+.hist{margin-top:1rem;font-size:.9rem;color:var(--dim);display:grid;gap:.3rem;text-align:right;min-height:1px}
+</style></head><body>
+<div class="app" id="app">
+<div class="top"><a href="https://vishalkumar-techy.github.io/">← Portfolio</a><button id="tg">Scientific</button></div>
+<div class="disp"><div id="ex"></div><div id="rs">0</div></div>
+<div class="sci" id="sci"></div><div class="keys" id="keys"></div><div class="hist" id="hist"></div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)};
+var ex='',res='0',hist=[],fresh=false;
+var SK=['sin(','cos(','tan(','log(','ln(','√(','π','^','(',')'];
+var KS=[['AC','ac'],['DEL','op'],['%','op'],['÷','op'],['7'],['8'],['9'],['×','op'],['4'],['5'],['6'],['−','op'],['1'],['2'],['3'],['+','op'],['0'],['.'],['00'],['=','eq']];
+function mk(p,l,c){var b=document.createElement('button');b.className='k '+(c||'');b.textContent=l;b.onclick=function(){press(l)};p.appendChild(b)}
+SK.forEach(function(l){mk($('sci'),l)});KS.forEach(function(k){mk($('keys'),k[0],k[1])});
+function calc(){
+  if(!ex)return '0';
+  var s=ex.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/g,'(Math.PI)').replace(/\^/g,'**')
+    .replace(/√\(/g,'R(').replace(/sin\(/g,'S(').replace(/cos\(/g,'C(').replace(/tan\(/g,'T(').replace(/log\(/g,'L(').replace(/ln\(/g,'N(')
+    .replace(/(\d+\.?\d*)%/g,'($1/100)').replace(/(^|[^0-9.])0+(\d)/g,'$1$2');
+  var o=(s.match(/\(/g)||[]).length,c=(s.match(/\)/g)||[]).length;while(c++<o)s+=')';
+  if(/[^0-9+\-*\/().\sMathPIRSCTLN]/.test(s))return null;
+  try{
+    var d=Math.PI/180,f=new Function('R','S','C','T','L','N','return '+s);
+    var v=f(Math.sqrt,function(x){return Math.sin(x*d)},function(x){return Math.cos(x*d)},function(x){return Math.tan(x*d)},Math.log10,Math.log);
+    if(typeof v!=='number'||!isFinite(v))return null;
+    return String(parseFloat(v.toPrecision(12)));
+  }catch(e){return null}
+}
+function draw(){$('ex').textContent=ex;$('rs').textContent=res;$('hist').innerHTML=hist.map(function(h){return '<div>'+h+'</div>'}).join('')}
+function press(k){
+  if(k==='='){var v=calc();if(v===null){res='Error'}else{if(ex!==v){hist.unshift(ex+' = '+v);hist=hist.slice(0,5)}ex=v;res=v;fresh=true}draw();return}
+  if(fresh&&/^[0-9.π(]|^[a-z√]/.test(k))ex='';
+  fresh=false;
+  if(k==='AC'){ex='';res='0'}else if(k==='DEL')ex=ex.slice(0,-1);else ex+=k;
+  if(!ex)res='0';else{var v2=calc();if(v2!==null)res=v2}
+  draw();
+}
+$('tg').onclick=function(){var a=$('app');a.classList.toggle('on');this.textContent=a.classList.contains('on')?'Basic':'Scientific'};
+addEventListener('keydown',function(e){var k=e.key,m={'*':'×','/':'÷','-':'−','Enter':'=','Backspace':'DEL','Escape':'AC'};
+  if(m[k])k=m[k];
+  if(/^[0-9.+()%^]$/.test(k)||['×','÷','−','=','DEL','AC'].indexOf(k)>-1){e.preventDefault();press(k)}});
+draw();
+</script></body></html>

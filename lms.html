@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>LearnHub LMS – Vishal Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050507;--ink:#f3f3f3;--dim:#9a9aa3;--line:rgba(255,255,255,.14);--ok:#3ddc84;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:radial-gradient(circle at 50% 0,#1d1d2b,var(--bg) 55%);color:var(--ink);font-family:"Inter Tight",system-ui,-apple-system,sans-serif;line-height:1.5;min-height:100svh}
+.wrap{max-width:980px;margin:0 auto;padding:1rem clamp(1rem,4vw,2rem) 3rem}
+header{display:flex;flex-wrap:wrap;gap:.6rem 1.2rem;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+header a{color:var(--dim);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:1.5rem;letter-spacing:-.03em}
+h2{font-size:clamp(1.6rem,4vw,2.2rem);letter-spacing:-.03em;margin:.8rem 0}
+nav{display:flex;gap:.4rem}
+button{font:inherit;color:inherit;cursor:pointer}
+nav button,.b,.lk{border:1px solid var(--line);background:rgba(255,255,255,.05);padding:.5rem 1rem;border-radius:999px}
+nav button:hover,.b:hover{background:rgba(255,255,255,.14)}
+.b{background:var(--ink);color:#000;font-weight:500}.b.alt{background:transparent;color:var(--ink)}
+.lk{background:none;border:0;padding:0;color:var(--dim);text-decoration:underline}
+:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.5rem}
+.stats div{padding:1rem;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.04);color:var(--dim);font-size:.85rem}
+.stats b{display:block;font-size:1.8rem;color:var(--ink)}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.cc{padding:1.3rem;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));display:flex;flex-direction:column;gap:.4rem}
+.cc h3{margin:0;font-size:1.25rem;letter-spacing:-.02em}.cc p{margin:0;color:#c2c2ca;font-size:.95rem;flex:1}.cc small{color:var(--dim)}
+.bar{height:6px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;margin:.6rem 0}
+.bar i{display:block;height:100%;background:var(--ok);transition:width .5s}
+.cols{display:grid;gap:1.2rem;margin-top:1rem}
+@media(min-width:760px){.cols{grid-template-columns:260px 1fr}}
+.ls{list-style:none;margin:0;padding:0;display:grid;gap:.4rem;align-content:start}
+.ls button{width:100%;text-align:left;padding:.65rem .9rem;border:1px solid var(--line);border-radius:12px;background:transparent}
+.ls button.on{background:rgba(255,255,255,.14)}
+.lesson{padding:1.4rem;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.04)}
+.lesson h3{margin:0 0 .6rem;font-size:1.4rem}.lesson p{color:#d0d0d8}
+.ok{color:var(--ok)}
+fieldset{border:1px solid var(--line);border-radius:16px;margin:0 0 1rem;padding:1rem}
+legend{padding:0 .4rem;font-weight:500}label{display:block;padding:.3rem 0}
+input[type=text],textarea{width:100%;padding:.7rem .9rem;margin:.3rem 0 .9rem;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font:inherit}
+.cert{margin-top:1.2rem;padding:2rem 1rem;text-align:center;border:2px solid var(--ink);border-radius:18px;background:rgba(255,255,255,.04)}
+.cert h3{font-size:1.8rem;margin:.3rem 0}.cert .nm{font-size:2rem;font-weight:800;border-bottom:1px solid var(--line);display:inline-block;min-width:60%;padding-bottom:.3rem}
+@media print{body{background:#fff;color:#000}header,nav,.b,.lk,input{display:none!important}.cert{border-color:#000}}
+</style></head><body>
+<div class="wrap"><header><div><a href="https://vishalkumar-techy.github.io/">← Portfolio</a><h1>LearnHub</h1></div>
+<nav><button data-a="v" data-v="home">Courses</button><button data-a="v" data-v="teach">Instructor</button></nav></header>
+<main id="m"></main></div>
+<script>
+var DEF=[
+{id:'web',t:'Web Development Basics',d:'Build your first web page with HTML, CSS and a little JavaScript.',
+ L:[['What is HTML?','HTML is the markup language that gives a web page its structure. Headings, paragraphs, links and images are all HTML elements.'],['Styling with CSS','CSS controls how elements look: colours, spacing, fonts and layout. Selectors choose which elements a rule applies to.'],['Adding JavaScript','JavaScript makes pages interactive. It can react to clicks, change the page and talk to servers.']],
+ Q:[['Which language gives a page its structure?',['HTML','CSS','SQL'],0],['What does CSS control?',['Database queries','How elements look','Server speed'],1],['Which language makes pages interactive?',['JavaScript','Markdown','YAML'],0]]},
+{id:'js',t:'JavaScript Essentials',d:'Variables, functions and arrays: the core of everyday JavaScript.',
+ L:[['Variables','Use let for values that change and const for values that do not. Prefer const by default.'],['Functions','A function is a reusable block of code. It takes inputs called parameters and can return a value.'],['Arrays and loops','An array stores an ordered list. Methods such as map, filter and forEach let you work through it without manual counters.']],
+ Q:[['Which keyword declares a constant?',['var','const','def'],1],['What does a function return when finished?',['A value','Only text','Nothing ever'],0],['Which method transforms every item of an array?',['map','push','join'],0]]},
+{id:'dsa',t:'Data Structures Intro',d:'Arrays, stacks, queues and how to think about speed with Big-O.',
+ L:[['Arrays','An array stores items in order and gives fast access by index.'],['Stacks and queues','A stack is last in, first out. A queue is first in, first out.'],['Big-O notation','Big-O describes how running time grows as the input grows. O(1) is constant and O(n) grows in step with the input.']],
+ Q:[['A stack is…',['First in, first out','Last in, first out','Random access only'],1],['Which grows fastest as n gets large?',['O(1)','O(n)','O(n²)'],2]]}
+];
+var S={en:{},cu:[],name:''};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem('lms1')||'{}'))}catch(e){}
+function save(){try{localStorage.setItem('lms1',JSON.stringify(S))}catch(e){}}
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function all(){return DEF.concat(S.cu)}
+function get(id){return all().filter(function(c){return c.id===id})[0]}
+var v='home',cur=null,li=0;
+function pr(c){var e=S.en[c.id];return e?Math.round(e.d.filter(Boolean).length/c.L.length*100):0}
+function done(c){var e=S.en[c.id];return !!e&&e.d.every(Boolean)&&(!c.Q||e.q>=60)}
+function home(){var n=0,ld=0,cc=0;
+  all().forEach(function(c){var e=S.en[c.id];if(e){n++;ld+=e.d.filter(Boolean).length}if(done(c))cc++});
+  return '<div class="stats"><div><b>'+n+'</b>Enrolled</div><div><b>'+ld+'</b>Lessons done</div><div><b>'+cc+'</b>Completed</div></div><div class="grid">'+
+  all().map(function(c){var p=pr(c),e=S.en[c.id];return '<article class="cc"><h3>'+esc(c.t)+'</h3><p>'+esc(c.d)+'</p><small>'+c.L.length+' lessons'+(c.Q?' · quiz':'')+'</small><div class="bar"><i style="width:'+p+'%"></i></div><button class="b" data-a="open" data-id="'+c.id+'">'+(e?(done(c)?'Review ✓':'Continue '+p+'%'):'Enroll')+'</button></article>'}).join('')+'</div>'}
+function course(){var c=get(cur),e=S.en[cur];
+  return '<button class="lk" data-a="v" data-v="home">← All courses</button><h2>'+esc(c.t)+'</h2><div class="bar"><i style="width:'+pr(c)+'%"></i></div><div class="cols"><ul class="ls">'+
+  c.L.map(function(l,i){return '<li><button data-a="les" data-i="'+i+'" class="'+(i===li?'on':'')+'">'+(e.d[i]?'✓ ':'○ ')+esc(l[0])+'</button></li>'}).join('')+
+  '</ul><div class="lesson"><h3>'+esc(c.L[li][0])+'</h3><p>'+esc(c.L[li][1]||'No content yet.')+'</p><button class="b" data-a="mark">'+(e.d[li]?'Completed ✓ (undo)':'Mark complete')+'</button> '+
+  (c.Q?'<button class="b alt" data-a="quiz">'+(e.q==null?'Take quiz':'Quiz '+e.q+'% – retake')+'</button>':'')+
+  (done(c)?'<p class="ok">🎉 Course completed. <button class="lk" data-a="cert">View certificate</button></p>':'')+'</div></div>'}
+function quiz(){var c=get(cur);
+  return '<button class="lk" data-a="open" data-id="'+cur+'">← Back to course</button><h2>Quiz: '+esc(c.t)+'</h2>'+
+  c.Q.map(function(q,n){return '<fieldset><legend>'+(n+1)+'. '+esc(q[0])+'</legend>'+q[1].map(function(o,j){return '<label><input type="radio" name="q'+n+'" value="'+j+'"> '+esc(o)+'</label>'}).join('')+'</fieldset>'}).join('')+
+  '<button class="b" data-a="grade">Submit answers</button><p id="qr"></p>'}
+function cert(){var c=get(cur);
+  return '<button class="lk" data-a="open" data-id="'+cur+'">← Back to course</button><h2>Certificate</h2><label>Your name<input type="text" id="nm" value="'+esc(S.name)+'" placeholder="Type your name"></label><div class="cert"><small>CERTIFICATE OF COMPLETION</small><h3>LearnHub</h3><p>This certifies that</p><div class="nm" id="cn">'+esc(S.name||'Your name')+'</div><p>has completed the course</p><h3>'+esc(c.t)+'</h3></div><p><button class="b" data-a="print">Print / save as PDF</button></p>'}
+function teach(){
+  return '<h2>Instructor: create a course</h2><label>Course title<input type="text" id="nt"></label><label>Short description<input type="text" id="nd"></label><label>Lessons, one per line, written as Title | content<textarea id="nl" rows="5" placeholder="Intro | Welcome to the course\nSetup | Install the tools"></textarea></label><button class="b" data-a="add">Add course</button><p id="tm" class="ok"></p><h3>Your courses</h3>'+
+  (S.cu.length?S.cu.map(function(c){return '<p>'+esc(c.t)+' <button class="lk" data-a="del" data-id="'+c.id+'">delete</button></p>'}).join(''):'<p style="color:var(--dim)">None yet. Courses you add appear in the catalog.</p>')}
+function R(){$('m').innerHTML=({home:home,course:course,quiz:quiz,cert:cert,teach:teach})[v]()}
+document.addEventListener('click',function(ev){
+  var t=ev.target.closest('[data-a]');if(!t)return;var a=t.dataset.a;
+  if(a==='v'){v=t.dataset.v;R();scrollTo(0,0)}
+  else if(a==='open'){cur=t.dataset.id;var c=get(cur);if(!S.en[cur])S.en[cur]={d:c.L.map(function(){return false}),q:null};save();v='course';li=0;R();scrollTo(0,0)}
+  else if(a==='les'){li=+t.dataset.i;R()}
+  else if(a==='mark'){S.en[cur].d[li]=!S.en[cur].d[li];save();R()}
+  else if(a==='quiz'){v='quiz';R();scrollTo(0,0)}
+  else if(a==='cert'){v='cert';R()}
+  else if(a==='print'){print()}
+  else if(a==='grade'){var q=get(cur).Q,ok=0;
+    q.forEach(function(x,n){var r=document.querySelector('input[name=q'+n+']:checked');if(r&&+r.value===x[2])ok++});
+    var p=Math.round(ok/q.length*100);S.en[cur].q=p;save();
+    $('qr').innerHTML='Score: <b>'+ok+'/'+q.length+' ('+p+'%)</b> – '+(p>=60?'<span class="ok">Passed!</span>':'Need 60% to pass. Review the lessons and try again.')}
+  else if(a==='add'){var tt=$('nt').value.trim(),ls=$('nl').value.split('\n').map(function(s){return s.trim()}).filter(Boolean);
+    if(!tt||!ls.length){$('tm').textContent='Add a title and at least one lesson.';return}
+    S.cu.push({id:'c'+Date.now(),t:tt,d:$('nd').value.trim()||'Custom course',L:ls.map(function(s){var p=s.split('|');return [p[0].trim(),(p[1]||'').trim()]}),Q:null});
+    save();R();$('tm').textContent='Course added! Find it under Courses.'}
+  else if(a==='del'){var id=t.dataset.id;S.cu=S.cu.filter(function(c){return c.id!==id});delete S.en[id];save();R()}
+});
+document.addEventListener('input',function(e){if(e.target.id==='nm'){S.name=e.target.value;save();$('cn').textContent=S.name||'Your name'}});
+R();
+</script></body></html>

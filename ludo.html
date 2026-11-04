@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Ludo – Vishal Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050507;--ink:#f3f3f3;--dim:#9a9aa3;--line:rgba(255,255,255,.14);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100svh;background:radial-gradient(circle at 50% 0,#1d1d2b,var(--bg) 60%);color:var(--ink);font-family:"Inter Tight",system-ui,-apple-system,sans-serif;padding:1rem;display:grid;place-items:center}
+.app{width:min(94vw,520px)}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--dim);margin-bottom:.8rem}
+.top a{color:inherit;text-decoration:none}
+.bar2{display:flex;align-items:center;gap:.7rem;margin-bottom:.4rem}
+#dot{width:16px;height:16px;border-radius:50%;border:2px solid #fff}
+#turn{font-size:1.1rem;flex:1}
+#dice{font:inherit;font-size:2.2rem;line-height:1;width:64px;height:56px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);cursor:pointer}
+#dice:active{transform:scale(.94)}
+#msg{min-height:1.6rem;color:var(--dim);font-size:.92rem;margin-bottom:.6rem}
+.board{position:relative;width:100%;aspect-ratio:1;border-radius:18px;overflow:hidden;background:#101016;border:1px solid var(--line)}
+.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(15,1fr);grid-template-rows:repeat(15,1fr)}
+.grid i{border:.5px solid rgba(255,255,255,.07);display:grid;place-items:center;font-style:normal;font-size:clamp(.5rem,2.6vw,.9rem);color:#555}
+.grid i.p{background:rgba(255,255,255,.9);border-color:rgba(0,0,0,.22)}
+.ctr{position:absolute;left:40%;top:40%;width:20%;height:20%;background:conic-gradient(from -45deg,#22c55e 0 25%,#facc15 0 50%,#3b82f6 0 75%,#ef4444 0)}
+.pc{position:absolute;width:5.4%;height:5.4%;border-radius:50%;transform:translate(-50%,-50%);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.6);transition:left .35s,top .35s;z-index:2}
+.pc.go{animation:pulse .6s infinite alternate;cursor:pointer;z-index:3}
+@keyframes pulse{to{transform:translate(-50%,-50%) scale(1.4);box-shadow:0 0 0 4px rgba(255,255,255,.6)}}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:.8rem;font-size:.9rem;color:var(--dim)}
+#ng{font:inherit;color:var(--ink);background:none;border:1px solid var(--line);border-radius:999px;padding:.35rem 1rem;cursor:pointer}
+@media(prefers-reduced-motion:reduce){.pc{transition:none}.pc.go{animation:none;outline:3px solid #fff}}
+</style></head><body>
+<div class="app">
+<div class="top"><a href="https://vishalkumar-techy.github.io/">← Portfolio</a><span>Ludo</span></div>
+<div class="bar2"><span id="dot"></span><b id="turn"></b><button id="dice" aria-label="Roll dice">🎲</button></div>
+<div id="msg"></div>
+<div class="board" id="bd"><div class="grid" id="gr"></div><div class="ctr"></div></div>
+<div class="foot"><label><input type="checkbox" id="fr"> Friends mode (4 humans)</label><button id="ng">New game</button></div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)};
+var P=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
+var C=['#ef4444','#22c55e','#facc15','#3b82f6'],N=['Red','Green','Yellow','Blue'],SF=[0,13,26,39,8,21,34,47],F='⚀⚁⚂⚃⚄⚅';
+var B=[[0,0],[0,9],[9,9],[9,0]],pos,turn,ph,mv,cpu,roll,over,gid=0,path={},pcs=[];
+P.forEach(function(a,i){path[a[0]*15+a[1]]=i});
+function hc(k,i){return [[7,1+i],[1+i,7],[7,13-i],[13-i,7]][k]}
+function ab(k,p){return (k*13+p)%52}
+function T(f,ms){var g=gid;setTimeout(function(){if(g===gid)f()},ms)}
+function say(t){$('msg').textContent=t}
+(function(){
+  var g=$('gr');
+  for(var r=0;r<15;r++)for(var c=0;c<15;c++){
+    var d=document.createElement('i'),key=r*15+c;
+    if(key in path){d.className='p';var x=path[key];if(x%13===0)d.style.background=C[x/13];else if(SF.indexOf(x)>-1)d.textContent='★'}
+    else{
+      var k=-1;for(var q=0;q<4;q++)for(var j=0;j<5;j++){var h=hc(q,j);if(h[0]===r&&h[1]===c)k=q}
+      if(k>=0)d.style.background=C[k];
+      else if(r<6&&c<6)d.style.background=C[0]+'44';else if(r<6&&c>8)d.style.background=C[1]+'44';
+      else if(r>8&&c>8)d.style.background=C[2]+'44';else if(r>8&&c<6)d.style.background=C[3]+'44';
+    }
+    g.appendChild(d);
+  }
+  for(var k=0;k<4;k++){pcs[k]=[];for(var i=0;i<4;i++){(function(k,i){var e=document.createElement('div');e.className='pc';e.style.background=C[k];e.onclick=function(){choose(k,i)};$('bd').appendChild(e);pcs[k][i]=e})(k,i)}}
+})();
+function xy(k,i){
+  var p=pos[k][i];
+  if(p<0){var s=[[2,2],[2,4],[4,2],[4,4]][i];return [s[1]+B[k][1],s[0]+B[k][0]]}
+  if(p<=50){var a=P[ab(k,p)];return [a[1]+.5,a[0]+.5]}
+  if(p<56){var h=hc(k,p-51);return [h[1]+.5,h[0]+.5]}
+  var o=[[-.6,0],[0,-.6],[.6,0],[0,.6]][k];return [7.5+o[0]+(i-1.5)*.1,7.5+o[1]];
+}
+function draw(){
+  var g={};
+  for(var k=0;k<4;k++)for(var i=0;i<4;i++){
+    var a=xy(k,i),key=a.join(),n=(g[key]=(g[key]||0)+1)-1,e=pcs[k][i];
+    e.style.left=(a[0]/15*100+n*1.1)+'%';e.style.top=(a[1]/15*100-n*1.1)+'%';
+    e.classList.toggle('go',ph==='pick'&&!cpu[turn]&&k===turn&&mv.indexOf(i)>-1);
+  }
+  $('turn').textContent=N[turn]+(cpu[turn]?' (CPU)':'');$('dot').style.background=C[turn];
+}
+function movable(){var o=[];pos[turn].forEach(function(p,i){if((p<0&&roll===6)||(p>=0&&p+roll<=56))o.push(i)});return o}
+function rollDice(){
+  if(ph!=='roll'||over)return;ph='rolling';var n=0,g=gid,t=setInterval(function(){
+    if(g!==gid){clearInterval(t);return}
+    $('dice').textContent=F[Math.floor(Math.random()*6)];
+    if(++n>8){clearInterval(t);roll=1+Math.floor(Math.random()*6);$('dice').textContent=F[roll-1];after()}
+  },70);
+}
+function after(){
+  mv=movable();
+  if(!mv.length){say(N[turn]+' rolled '+roll+': no move');return T(next,900)}
+  ph='pick';draw();
+  if(cpu[turn])return T(function(){go(best())},750);
+  if(mv.length===1){say('Rolled '+roll);return T(function(){go(mv[0])},450)}
+  say('Rolled '+roll+': tap a glowing piece');
+}
+function choose(k,i){if(ph==='pick'&&!cpu[turn]&&k===turn&&mv.indexOf(i)>-1)go(i)}
+function hit(k,a){var r=[];pos[k].forEach(function(z,j){if(z>=0&&z<=50&&ab(k,z)===a)r.push(j)});return r}
+function best(){
+  var bs=-1,bi=mv[0];
+  mv.forEach(function(i){
+    var p=pos[turn][i],q=p<0?0:p+roll,s=q;
+    if(p<0)s+=50;if(q===56)s+=80;
+    if(q<=50){var a=ab(turn,q);if(SF.indexOf(a)>-1)s+=15;else for(var k=0;k<4;k++)if(k!==turn&&hit(k,a).length)s+=100}
+    if(s>bs){bs=s;bi=i}
+  });
+  return bi;
+}
+function go(i){
+  ph='move';var p=pos[turn][i],cap=false;pos[turn][i]=p<0?0:p+roll;var q=pos[turn][i];
+  if(q<=50){var a=ab(turn,q);if(SF.indexOf(a)<0)for(var k=0;k<4;k++)if(k!==turn)hit(k,a).forEach(function(j){pos[k][j]=-1;cap=true})}
+  draw();
+  if(pos[turn].every(function(z){return z===56})){over=true;say('🏆 '+N[turn]+' wins!');return}
+  var extra=roll===6||cap||q===56;if(cap)say('Captured!');
+  T(function(){if(extra){ph='roll';draw();say(N[turn]+' rolls again'+(cpu[turn]?'…':': tap the dice'));if(cpu[turn])T(rollDice,600)}else next()},650);
+}
+function next(){turn=(turn+1)%4;ph='roll';mv=[];draw();say(N[turn]+(cpu[turn]?' is rolling…':': tap the dice'));if(cpu[turn])T(rollDice,700)}
+function ng(){gid++;pos=[0,1,2,3].map(function(){return [-1,-1,-1,-1]});turn=0;ph='roll';mv=[];over=false;cpu=$('fr').checked?[0,0,0,0]:[0,1,1,1];$('dice').textContent='🎲';draw();say('You are Red. Roll a 6 to bring a piece out. Tap the dice!')}
+$('dice').onclick=function(){if(!cpu[turn])rollDice()};$('ng').onclick=ng;$('fr').onchange=ng;ng();
+</script></body></html>
