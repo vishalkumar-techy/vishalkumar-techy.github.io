@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Snakes and Ladders – Vishal Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050507;--ink:#f3f3f3;--dim:#9a9aa3;--line:rgba(255,255,255,.14);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100svh;background:radial-gradient(circle at 50% 0,#1d1d2b,var(--bg) 60%);color:var(--ink);font-family:"Inter Tight",system-ui,-apple-system,sans-serif;padding:1rem;display:grid;place-items:center}
+.app{width:min(94vw,520px)}
+.top{display:flex;justify-content:space-between;font-size:.85rem;color:var(--dim);margin-bottom:.8rem}
+.top a{color:inherit;text-decoration:none}
+.bar{display:flex;align-items:center;gap:.7rem;margin-bottom:.4rem}
+#dot{width:16px;height:16px;border-radius:50%;border:2px solid #fff}
+#turn{flex:1;font-size:1.1rem}
+#dice{font:inherit;font-size:2.2rem;line-height:1;width:64px;height:56px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);cursor:pointer}
+#dice:active{transform:scale(.94)}
+#msg{min-height:1.6rem;color:var(--dim);font-size:.92rem;margin-bottom:.6rem}
+.wrapb{position:relative;margin-bottom:2rem}
+.board{position:relative;width:100%;aspect-ratio:1;border-radius:14px;overflow:hidden;border:1px solid var(--line);display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(10,1fr)}
+.board i{font-style:normal;font-size:clamp(.45rem,2vw,.75rem);color:rgba(255,255,255,.55);padding:2px 3px;background:#12121a}
+.board i:nth-child(even){background:#181824}
+.board svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.tk{position:absolute;width:4.4%;height:4.4%;border-radius:50%;border:2px solid #fff;transform:translate(-50%,-50%);transition:left .2s,top .4s;box-shadow:0 2px 6px rgba(0,0,0,.6);z-index:3}
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--dim)}
+#ng{font:inherit;color:var(--ink);background:none;border:1px solid var(--line);border-radius:999px;padding:.35rem 1rem;cursor:pointer}
+@media(prefers-reduced-motion:reduce){.tk{transition:none}}
+</style></head><body>
+<div class="app">
+<div class="top"><a href="https://vishalkumar-techy.github.io/">← Portfolio</a><span>Snakes and Ladders</span></div>
+<div class="bar"><span id="dot"></span><b id="turn"></b><button id="dice" aria-label="Roll dice">🎲</button></div>
+<div id="msg"></div>
+<div class="wrapb"><div class="board" id="bd"></div></div>
+<div class="foot"><label><input type="checkbox" id="fr"> 2 players (no CPU)</label><button id="ng">New game</button></div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)};
+var SN={16:6,47:26,49:11,56:53,62:19,64:60,87:24,93:73,95:75,98:78},LD={1:38,4:14,9:31,21:42,28:84,36:44,51:67,71:91,80:100};
+var F='⚀⚁⚂⚃⚄⚅',COL=['#3b82f6','#ef4444'],NAME=['You','CPU'],tk=[],pl,turn,busy,over,six,cpu,gid=0;
+function xy(n){var i=n-1,r=Math.floor(i/10),c=r%2===0?i%10:9-i%10;return [(c+.5)*10,(9-r+.5)*10]}
+function T(f,ms){var g=gid;setTimeout(function(){if(g===gid)f()},ms)}
+function say(t){$('msg').textContent=t}
+(function(){
+  var bd=$('bd'),h='';
+  for(var rv=0;rv<10;rv++){var r=9-rv;for(var cv=0;cv<10;cv++){h+='<i>'+(r*10+(r%2===0?cv+1:10-cv))+'</i>'}}
+  var s='<svg viewBox="0 0 100 100" preserveAspectRatio="none">',sc=['#ef4444','#22c55e','#a855f7','#f97316','#14b8a6'],k=0;
+  Object.keys(LD).forEach(function(a){
+    var p=xy(+a),q=xy(LD[a]),dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy),nx=-dy/L*1.3,ny=dx/L*1.3;
+    s+='<g stroke="#e0b25a" stroke-width=".7" stroke-linecap="round"><line x1="'+(p[0]+nx)+'" y1="'+(p[1]+ny)+'" x2="'+(q[0]+nx)+'" y2="'+(q[1]+ny)+'"/><line x1="'+(p[0]-nx)+'" y1="'+(p[1]-ny)+'" x2="'+(q[0]-nx)+'" y2="'+(q[1]-ny)+'"/>';
+    for(var t=.08;t<1;t+=.08){var cx=p[0]+dx*t,cy=p[1]+dy*t;s+='<line x1="'+(cx+nx)+'" y1="'+(cy+ny)+'" x2="'+(cx-nx)+'" y2="'+(cy-ny)+'"/>'}
+    s+='</g>';
+  });
+  Object.keys(SN).forEach(function(a){
+    var p=xy(+a),q=xy(SN[a]),dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy),nx=-dy/L*7,ny=dx/L*7,c=sc[k++%5];
+    s+='<path d="M'+p[0]+' '+p[1]+' C'+(p[0]+dx*.3+nx)+' '+(p[1]+dy*.3+ny)+' '+(p[0]+dx*.7-nx)+' '+(p[1]+dy*.7-ny)+' '+q[0]+' '+q[1]+'" fill="none" stroke="'+c+'" stroke-width="1.8" stroke-linecap="round" opacity=".9"/><circle cx="'+p[0]+'" cy="'+p[1]+'" r="1.9" fill="'+c+'"/><circle cx="'+(p[0]-.6)+'" cy="'+(p[1]-.4)+'" r=".35" fill="#fff"/><circle cx="'+(p[0]+.6)+'" cy="'+(p[1]-.4)+'" r=".35" fill="#fff"/>';
+  });
+  bd.innerHTML=h+s+'</svg>';
+  for(var i=0;i<2;i++){var e=document.createElement('div');e.className='tk';e.style.background=COL[i];bd.appendChild(e);tk[i]=e}
+  $('bd').parentNode.appendChild(tk[0]);$('bd').parentNode.appendChild(tk[1]);
+})();
+function draw(){
+  pl.forEach(function(p,i){var a=p.p?xy(p.p):[8+i*7,106],o=i?1.2:-1.2;tk[i].style.left=(a[0]+(p.p?o:0))+'%';tk[i].style.top=(a[1]+(p.p?o:0))+'%'});
+  $('turn').textContent=pl[turn].n+(cpu[turn]?' (CPU)':'')+' (square '+pl[turn].p+')';$('dot').style.background=COL[turn];
+}
+function roll(){
+  if(busy||over)return;busy=true;var n=0,g=gid,t=setInterval(function(){
+    if(g!==gid){clearInterval(t);return}
+    $('dice').textContent=F[Math.floor(Math.random()*6)];
+    if(++n>8){clearInterval(t);var v=1+Math.floor(Math.random()*6);$('dice').textContent=F[v-1];six=v===6;move(v)}
+  },70);
+}
+function move(v){
+  var p=pl[turn];
+  if(p.p+v>100){say(p.n+' rolled '+v+': need exact number to reach 100');six=false;return T(next,900)}
+  say(p.n+' rolled '+v);var left=v;
+  (function hop(){if(left===0)return land();p.p++;left--;draw();T(hop,230)})();
+}
+function land(){
+  var p=pl[turn],n=p.p;
+  if(LD[n]){say('🪜 Ladder! '+n+' → '+LD[n]);p.p=LD[n]}else if(SN[n]){say('🐍 Snake! '+n+' → '+SN[n]);p.p=SN[n]}
+  T(function(){
+    draw();
+    if(p.p===100){over=true;busy=false;say('🏆 '+p.n+' wins!');return}
+    T(next,800);
+  },LD[n]||SN[n]?450:0);
+}
+function next(){
+  if(!six)turn=1-turn;
+  var again=six;six=false;busy=false;draw();
+  say(again?pl[turn].n+' rolled a 6, roll again':pl[turn].n+(cpu[turn]?' is rolling…':': tap the dice'));
+  if(cpu[turn])T(roll,800);
+}
+function ng(){gid++;pl=[{n:'You',p:0},{n:$('fr').checked?'Player 2':'CPU',p:0}];cpu=$('fr').checked?[0,0]:[0,1];turn=0;busy=false;over=false;six=false;$('dice').textContent='🎲';draw();say('Tap the dice. A 6 gives another turn. You need the exact number to land on 100.')}
+$('dice').onclick=function(){if(!cpu[turn])roll()};$('ng').onclick=ng;$('fr').onchange=ng;ng();
+</script></body></html>
