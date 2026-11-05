@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Snake – Vishal Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050507;--ink:#f3f3f3;--dim:#9a9aa3;--line:rgba(255,255,255,.14);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100svh;background:radial-gradient(circle at 50% 0,#1d1d2b,var(--bg) 60%);color:var(--ink);font-family:"Inter Tight",system-ui,-apple-system,sans-serif;padding:1rem;display:grid;place-items:center;-webkit-user-select:none;user-select:none}
+.app{width:min(94vw,480px)}
+.top{display:flex;justify-content:space-between;font-size:.85rem;color:var(--dim);margin-bottom:.8rem}
+.top a{color:inherit;text-decoration:none}
+.sc{display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem}
+.sc div{font-size:.8rem;color:var(--dim)}.sc b{display:block;font-size:1.6rem;color:var(--ink);line-height:1.1}
+#go{font:inherit;font-weight:500;padding:.6rem 1.3rem;border-radius:999px;border:0;background:var(--ink);color:#000;cursor:pointer}
+canvas{display:block;width:100%;aspect-ratio:1;border-radius:16px;border:1px solid var(--line);touch-action:none;background:#0d0d14}
+.pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,56px);gap:.4rem;justify-content:center;margin-top:1rem}
+.pad button{font:inherit;font-size:1.3rem;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--ink);cursor:pointer}
+.pad button:active{background:rgba(255,255,255,.2)}
+.pad .u{grid-column:2}.pad .l{grid-column:1;grid-row:2}.pad .d{grid-column:2;grid-row:2}.pad .r{grid-column:3;grid-row:2}
+.hint{text-align:center;color:var(--dim);font-size:.8rem;margin-top:.8rem}
+:focus-visible{outline:2px solid #fff;outline-offset:2px}
+</style></head><body>
+<div class="app">
+<div class="top"><a href="https://vishalkumar-techy.github.io/">← Portfolio</a><span>Snake</span></div>
+<div class="sc"><div>Score<b id="sc">0</b></div><div>Best<b id="bs">0</b></div><button id="go">Start</button></div>
+<canvas id="c" aria-label="Snake game board"></canvas>
+<div class="pad"><button class="u" data-d="u" aria-label="Up">▲</button><button class="l" data-d="l" aria-label="Left">◀</button><button class="d" data-d="d" aria-label="Down">▼</button><button class="r" data-d="r" aria-label="Right">▶</button></div>
+<div class="hint">Arrow keys or WASD · swipe on the board · Space to pause</div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)},cv=$('c'),ctx=cv.getContext('2d'),N=20,S=0;
+var snake,dir,q,food,score,best=0,speed,state='ready',timer;
+try{best=+localStorage.getItem('snake_best')||0}catch(e){}
+$('bs').textContent=best;
+function size(){var w=cv.clientWidth,r=window.devicePixelRatio||1;cv.width=cv.height=Math.round(w*r);S=cv.width/N;draw()}
+function reset(){snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];dir={x:1,y:0};q=[];score=0;speed=140;$('sc').textContent=0;place()}
+function place(){do{food={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N)}}while(snake.some(function(s){return s.x===food.x&&s.y===food.y}))}
+function turn(d){
+  var m={u:{x:0,y:-1},d:{x:0,y:1},l:{x:-1,y:0},r:{x:1,y:0}}[d],last=q.length?q[q.length-1]:dir;
+  if(state==='ready'||state==='over'){start()}
+  if(m.x===-last.x&&m.y===-last.y||m.x===last.x&&m.y===last.y)return;
+  if(q.length<2)q.push(m);
+}
+function start(){if(state==='run')return;if(state!=='pause')reset();state='run';$('go').textContent='Pause';loop()}
+function pause(){if(state!=='run')return;state='pause';clearTimeout(timer);$('go').textContent='Resume';draw()}
+function loop(){timer=setTimeout(function(){step();if(state==='run')loop()},speed)}
+function step(){
+  if(q.length)dir=q.shift();
+  var h={x:snake[0].x+dir.x,y:snake[0].y+dir.y},eat=h.x===food.x&&h.y===food.y,body=eat?snake:snake.slice(0,-1);
+  if(h.x<0||h.y<0||h.x>=N||h.y>=N||body.some(function(s){return s.x===h.x&&s.y===h.y})){return over()}
+  snake.unshift(h);
+  if(eat){score+=10;$('sc').textContent=score;speed=Math.max(60,speed-3);place()}else snake.pop();
+  draw();
+}
+function over(){
+  state='over';clearTimeout(timer);$('go').textContent='Play again';
+  if(score>best){best=score;$('bs').textContent=best;try{localStorage.setItem('snake_best',best)}catch(e){}}
+  draw();
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);ctx.fill()}
+function draw(){
+  if(!S)return;ctx.clearRect(0,0,cv.width,cv.height);
+  for(var i=0;i<N;i++)for(var j=0;j<N;j++){ctx.fillStyle=(i+j)%2?'#10101a':'#0d0d14';ctx.fillRect(i*S,j*S,S,S)}
+  if(!snake)return;
+  ctx.fillStyle='#ff5c5c';ctx.beginPath();ctx.arc((food.x+.5)*S,(food.y+.5)*S,S*.36,0,7);ctx.fill();
+  snake.forEach(function(s,i){var t=1-i/Math.max(snake.length,8)*.6;ctx.fillStyle='rgb('+Math.round(61*t)+','+Math.round(220*t)+','+Math.round(132*t)+')';rr(s.x*S+S*.06,s.y*S+S*.06,S*.88,S*.88,S*.28)});
+  var h=snake[0];ctx.fillStyle='#050507';
+  [.3,.7].forEach(function(o){var ex=dir.x?(dir.x>0?.72:.28):o,ey=dir.y?(dir.y>0?.72:.28):o;ctx.beginPath();ctx.arc((h.x+ex)*S,(h.y+ey)*S,S*.08,0,7);ctx.fill()});
+  if(state!=='run'){
+    ctx.fillStyle='rgba(5,5,7,.65)';ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.fillStyle='#f3f3f3';ctx.textAlign='center';ctx.font='800 '+S*1.3+'px "Inter Tight",sans-serif';
+    ctx.fillText(state==='over'?'Game over':state==='pause'?'Paused':'Snake',cv.width/2,cv.height/2-S*.2);
+    ctx.font='500 '+S*.7+'px "Inter Tight",sans-serif';ctx.fillStyle='#9a9aa3';
+    ctx.fillText(state==='over'?'Score '+score+'. Tap Play again':'Tap Start or press an arrow key',cv.width/2,cv.height/2+S*1);
+  }
+}
+$('go').onclick=function(){state==='run'?pause():start()};
+document.querySelectorAll('.pad button').forEach(function(b){b.addEventListener('pointerdown',function(e){e.preventDefault();turn(b.dataset.d)})});
+addEventListener('keydown',function(e){
+  var m={ArrowUp:'u',w:'u',W:'u',ArrowDown:'d',s:'d',S:'d',ArrowLeft:'l',a:'l',A:'l',ArrowRight:'r',d:'r',D:'r'}[e.key];
+  if(m){e.preventDefault();turn(m)}else if(e.key===' '||e.key==='p'){e.preventDefault();state==='run'?pause():start()}
+});
+var tx,ty;
+cv.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+cv.addEventListener('touchend',function(e){
+  var t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<24){state==='run'?pause():start();return}
+  turn(Math.abs(dx)>Math.abs(dy)?(dx>0?'r':'l'):(dy>0?'d':'u'));
+},{passive:true});
+addEventListener('resize',size);reset();size();
+</script></body></html>
